@@ -256,4 +256,4 @@ for label in labels:
 
 # 保存ASO
 aso_pd = pd.DataFrame(asos)
-aso_pd.to_csv(mol_dir+"ASO_Catalysts.csv")
+aso_pd.to_csv(mol_dir+"ASO_Catalysts.csv", index=None)
