@@ -9,7 +9,7 @@
 ```Raw_ASO_data.zip```是Denmark组计算的所有化合物的ASO值
 
 
-**存在的问题：
+**存在的问题**：
 
 + 和Denmark组计算的ASO有差异
 
