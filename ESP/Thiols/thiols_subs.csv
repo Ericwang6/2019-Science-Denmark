@@ -1,0 +1,6 @@
+smiles,label,charge
+C[N+](C)(C)CC1=CC=CC=C1,thiol_A,1
+CCC[N+](CCC)(CCC)CCC,thiol_B,1
+C1(CCCCC1)C[N+](CC2CCCCC2)(CC3CCCCC3)CC4CCCCC4,thiol_C,1
+C[N+](C)(C)CC1=CC=C(OC)C=C1,thiol_D,1
+C[N+](C)(C)CC1=C(C)C=CC=C1,thiol_E,1
