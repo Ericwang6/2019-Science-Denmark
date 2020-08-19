@@ -34,7 +34,7 @@
 
 + 修正了328_vi的Smiles错误
 
-+ 增加了```Automated_SubsExtract.ipynb```文件，用于自动从Catalysts中提取取代基并与$\mathrm{NMe}_4^+$基团bonding
++ 增加了```Automated_SubsExtract.ipynb```文件，用于自动从Catalysts中提取取代基并与NMe4+基团bonding
 
 
 **说明**：
