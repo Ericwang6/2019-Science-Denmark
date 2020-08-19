@@ -28,3 +28,17 @@
 ```.nw```是使用NWChem计算ESP的输入文件
 
 ```.xyz```文件是经过DFT优化后的分子坐标，```xxx-xxx.xyz```是优化过程中产生的历史文件
+
+
+## 2020.08.19 更新
+
++ 修正了328_vi的Smiles错误
+
++ 增加了```Automated_SubsExtract.ipynb```文件，用于自动从Catalysts中提取取代基并与$\mathrm{NMe}_4^+$基团bonding
+
+
+**说明**：
+
+使用```Chem.ReplaceCore```函数，将催化剂的骨架移除，得到有虚原子（dummy atom）标记取代位点的取代基集合
+
+使用```Chem.GetMolFrags```函数，得到所有取代基
