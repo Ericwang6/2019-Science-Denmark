@@ -42,3 +42,8 @@
 使用```Chem.ReplaceCore```函数，将催化剂的骨架移除，得到有虚原子（dummy atom）标记取代位点的取代基集合
 
 使用```Chem.GetMolFrags```函数，得到所有取代基
+
+
+## 2020.08.30 更新
+
++ 计算了由不同起始构象计算出的ESPMAX的值，用以探究ESPMAX对构象的敏感程度，结果储存在```/ESP/ESP_with_conf```目录下
