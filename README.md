@@ -47,3 +47,30 @@
 ## 2020.08.30 更新
 
 + 计算了由不同起始构象计算出的ESPMAX的值，用以探究ESPMAX对构象的敏感程度，结果储存在```/ESP/ESP_with_conf```目录下
+
+
+## 2020.09.03 更新
+
++ 增加了5种Thiol的NBO分析结果
+
++ 增加了```data_prepare.py```：定义了一系列用于处理数据的函数
+
+    + ```split_combinations(mode='random', save_to_file="")```：可根据文献中提到的不同split方式对'Catalyst-Substrate'组合进行划分，并将划分结果储存在```save_to_file```中
+    
+    + ```load_my_data(save_to_file="", from_file="")```和```load_Denmark_data(save_to_file="", from_file="")```：加载数据集并去除方差等于0的维度、进行scale并进行boxcox变换，最后保存在```save_to_file```中。或从```from_file```中加载所需的数据集
+    
+    + ```load_data(data, train_combinations, test_combinations, feature_selection="", n_features=100)```：按照指定的方式对数据集进行feature selection并划分成training set和test set
+
++ 增加了```LoadData.py```：按照SI中**Fig S9**的方式对数据集进行split，划分好的数据集以二进制序列文件形式保存在```/CombinationSplit/combination_split.pickle```中
+
++ 增加了```ModelSelection.py```“：按照SI中**Fig S9**的方式对数据集进行split，使用**Random Forerst, Support Vector Machine(kernel=rbf, poly_2, linear), LassoCV, LassoLarsCV, RidgeCV, ElasticNet, KernelRidge(kernel=rbf, linear)**等模型进行数据处理，训练好的模型以二进制序列保存在```/DATA/CombinationSplit/models.pickle```中，预测值分别以二进制序列文件保存在```/DATA/CombinationSplit/results.pickle```和```/DATA/CombinationSplit/results.pickle```中。
+
++ 增加了```CaseStudy.ipynb```文件，对Fig 5B和Fig S10两个Case进行了复现：
+
+    + Fig 5B：比较19种Test Catalysts催化的25个Imine-Thiol组合的平均ddG值
+    
+    + Fig S10：使用mutual_info_regression方法对数据进行降维，取25%的维度，然后比较不同模型在三种Test Set上的MAD和R^2
+
+**问题**：
+
++ 两个Case Study表明RF的表现异常地好，而SVR的表现很差，与SI中报告的结果不符
