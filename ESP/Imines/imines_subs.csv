@@ -1,6 +1,6 @@
 smiles,label,charge
-C[N+](C)(C)CC1=CC=CC=C1,imine_1,1
-C[N+](C)(C)CC1=CC=C(C(F)(F)F)C=C1,imine_2,1
-C[N+](C)(C)CC1=CC=C(OC)C=C1,imine_3,1
-C[N+](C)(C)CC1=CC=C(C=CC=C2)C2=C1,imine_4,1
-C[N+](C)(C)CC1=C(C)C=CC=C1,imine_5,1
+C[N+](C)(C)CC1=CC=CC=C1,1,1
+C[N+](C)(C)CC1=CC=C(C(F)(F)F)C=C1,2,1
+C[N+](C)(C)CC1=CC=C(OC)C=C1,3,1
+C[N+](C)(C)CC1=CC=C(C=CC=C2)C2=C1,4,1
+C[N+](C)(C)CC1=C(Cl)C=C(Cl)C=C1,5,1
