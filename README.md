@@ -74,3 +74,41 @@
 **问题**：
 
 + 两个Case Study表明RF的表现异常地好，而SVR的表现很差，与SI中报告的结果不符
+
+## 2020.09.11 更新
+
++ 增加了```Reaction_data.xlsx```和```Denmark_data_original.xlsx```两份原始数据文件
+
++ 增加了```SIF```文件夹，其中是复现JACS中提到的**SIF**描述符（只考虑1个构象的ASO描述符）
+
++ 增加了```ddG_check.ipynb```，用于比较ddG的差异。结果：相差最多0.0015kcal/mol
+
++ 重写了```data_prepare.py```，在函数中增加了选择描述符的API，以便后续工作中筛选/比较不同描述符的结果
+
++ 增加了```LoadData.ipynb```，加载不同CaseStudy所需要的数据
+
++ 在```CaseStudy.ipynb```中增加了Fig 6和JACS-CaseStudy1的复现结果
+
++ 增加了```RandomSplit```文件夹，其中是根据```Denmark_data_original.xlsx```对数据进行split并测试的代码和结果（文件过大，进行了压缩）
+
+### ！！勘误！！
+
+1. SI中Fig S1将Imine-5的分子式画错了，取代基应是(2',4')二氯苯基
+
+2. ```Reaction_data.xlsx```中所有的**202_i**都应该是**202_vi**
+
+3. ```Denmark_data_original.xlsx```中原本应是**328_vi**的SMILES误写成了**328_i**的SMILES
+
+**结果和问题**
+
+1. RandomSplit的结果表明RF的表现确实过于优秀，但SVR的表现也符合预期，比CombinationSplit的结果好很多。究其原因，可能是SVR有较大的过拟合倾向，后续考虑进一步降低Input的维度。
+
+2. RF在使用SIF+ESPMAX的结果也十分的突出，甚至与ASO+ESPMAX表现无异
+
+**工作计划**
+
+1. 继续进行JACS文章中CaseStudy的复现
+
+2. 寻找新的反应，并在新的反应上测试各种描述符的表现
+
+3. 学习量化软件的使用，复现Sigman的Nature文章
