@@ -1,0 +1,7 @@
+label,smiles
+A,SC1=CC=CC=C1
+B,CCS
+C,SC1CCCCC1
+D,SC1=CC=C(OC)C=C1
+E,SC1=C(C)C=CC=C1
+ref,CS
