@@ -5,7 +5,7 @@ from scipy.stats import boxcox
 import random
 from sklearn.decomposition import PCA
 from sklearn.feature_selection import mutual_info_regression as MIR
-from sklearn.feature_selection import SelectKBest, SelectPercentile, f_regression
+from sklearn.feature_selection import SelectKBest, SelectPercentile, f_regression, VarianceThreshold
 
 # descriptors
 catalyst_descriptors = {}
@@ -19,7 +19,7 @@ reactions = reaction_data["Reaction"]
 catalysts = list(set(reactions.apply(lambda x: x.split("_")[0] + "_" + x.split("_")[1])))
 imines = ["1", "2", "3", "4", "5"]
 thiols = ["A", "B", "C", "D", "E"]
-products = [f"{i}_{t}" for i in imines for t in thiols]
+products = ["{}_{}".format(i, t) for i in imines for t in thiols]
 ddG = pd.Series(list(reaction_data["ddG"]), index=list(reaction_data["Reaction"]))
     
 # Split catalyst-imine-thiol combinations
@@ -35,17 +35,17 @@ def split_combinations(mode='random', save_to_file=""):
                            '99_vi', '328_vi', '99_i', '144_i', '230_i', '245_vi']
         test_catalysts = [c for c in catalysts if c not in train_catalysts]
         
-        train_subs = [f"{i}_{t}" for i in imines[:-1] for t in thiols[:-1]]
-        test_subs = [s for s in [f"{i}_{t}" for i in imines for t in thiols] if s not in train_subs]
+        train_subs = ["{}_{}".format(i, t) for i in imines[:-1] for t in thiols[:-1]]
+        test_subs = [s for s in ["{}_{}".format(i, t) for i in imines for t in thiols] if s not in train_subs]
         
-        train_combinations = [f"{c}_{s}" for c in train_catalysts for s in train_subs]
+        train_combinations = ["{}_{}".format(c, s) for c in train_catalysts for s in train_subs]
         test_combinations = []
         # Catalysts Test
-        test_combinations.append([f"{c}_{s}" for c in test_catalysts for s in train_subs])
+        test_combinations.append(["{}_{}".format(c, s) for c in test_catalysts for s in train_subs])
         # Substrate Test
-        test_combinations.append([f"{c}_{s}" for c in train_catalysts for s in test_subs])
+        test_combinations.append(["{}_{}".format(c, s) for c in train_catalysts for s in test_subs])
         # Catalysts/Substrate Test
-        test_combinations.append([f"{c}_{s}" for c in test_catalysts for s in test_subs])
+        test_combinations.append(["{}_{}".format(c, s) for c in test_catalysts for s in test_subs])
         
     elif mode == "ee":
         train_combinations = reaction_data[reaction_data["% ee"] < 80]["Reaction"]
@@ -68,8 +68,8 @@ def load_descriptor(descriptor, origin="Denmark"):
         raw_ESP_catalysts = pd.read_csv("../ESP/Catalysts/ESP_catalysts.csv", index_col=0)
         ESP_catalysts = pd.DataFrame()
         for col in raw_ESP_catalysts:
-            ESP_catalysts[f"{col}_i"] = raw_ESP_catalysts[col]
-            ESP_catalysts[f"{col}_vi"] = raw_ESP_catalysts[col]
+            ESP_catalysts["{}_i".format(col)] = raw_ESP_catalysts[col]
+            ESP_catalysts["{}_vi".format(col)] = raw_ESP_catalysts[col]
         if descriptor == "ESPMAX_catalysts":
             catalyst_descriptors[descriptor] = ESP_catalysts.loc["ESPMAX"]
         elif descriptor == "ESPMIN_catalysts":
@@ -98,7 +98,7 @@ def load_descriptor(descriptor, origin="Denmark"):
     
     elif descriptor == "ESP" or descriptor == "ESPMAX" or descriptor == "ESPMIN":
         for item in ["catalysts", "imines", "thiols"]:
-            load_descriptor(f"{descriptor}_{item}")
+            load_descriptor("{}_{}".format(descriptor, item))
     
     # ASO descriptor
     elif "ASO" in descriptor and origin == "Denmark":
@@ -116,7 +116,7 @@ def load_descriptor(descriptor, origin="Denmark"):
             for item in ["ASO_catalysts", "ASO_imines", "ASO_products"]:
                 load_descriptor(item, origin="Denmark")
         else:
-            raise ValueError(f"Descriptor {descriptor} not found.")
+            raise ValueError("Descriptor {} not found.".format(descriptor))
     
     elif "ASO" in descriptor and origin == "My":
         if descriptor == 'ASO_catalysts':
@@ -136,7 +136,7 @@ def load_descriptor(descriptor, origin="Denmark"):
             for item in ["ASO_catalysts", "ASO_imines", "ASO_thiols", "ASO_products"]:
                 load_descriptor(item, origin="My")
         else:
-            raise ValueError(f"Descriptor {descriptor} not found.")
+            raise ValueError("Descriptor {} not found.".format(descriptor))
     
     # NBO descriptor
     elif descriptor == "NBO":
@@ -162,12 +162,13 @@ def load_descriptor(descriptor, origin="Denmark"):
             load_descriptor(item)
             
     else:
-        raise ValueError(f"Descriptor {descriptor} not found.")
+        raise ValueError("Descriptor {} not found.".format(descriptor))
 
 
 # Load data according to given descriptors
-def load_raw_data(descriptors=None, save_to_file=None, from_file=None, origin="Denmark"):
+def load_raw_data(descriptors=None, save_to_file=None, from_file=None, origin="Denmark", scale=True, boxcox_=True):
     global reactions, ee
+    global catalyst_descriptors, imine_descriptors, thiol_descriptors, product_descriptors
     if not from_file:
         if descriptors:
             data = {}
@@ -177,7 +178,7 @@ def load_raw_data(descriptors=None, save_to_file=None, from_file=None, origin="D
                 catalyst = reaction.split("_")[0] + "_" + reaction.split("_")[1]
                 imine = reaction.split("_")[2]
                 thiol = reaction.split("_")[3]
-                product = f"{imine}_{thiol}"
+                product = "{}_{}".format(imine, thiol)
 
                 vector = []
                 vector += [pd.Series(catalyst_descriptors[key][catalyst]) for key in catalyst_descriptors.keys()]
@@ -189,37 +190,49 @@ def load_raw_data(descriptors=None, save_to_file=None, from_file=None, origin="D
 
             data = pd.DataFrame(data)
             data = data.dropna(axis=0, how='all')
+            
+            if scale:
+                # Remove var = 0
+                data = data[data.apply(lambda x: x.var() != 0, axis=1)]
 
-            # Remove var = 0
-            data = data[data.apply(lambda x: x.var() != 0, axis=1)]
-
-            # Scale to unit variance
-            data = data.apply(lambda x: (x - x.mean()) / x.std(), axis=1)
-
-            # Box-cox transformation
-            shift = abs(ddG.min()) + 1.0
-            transformed_ddG, lambda_ = boxcox(ddG + shift)
+                # Scale to unit variance
+                data = data.apply(lambda x: (x - x.mean()) / x.std(), axis=1)
 
             # Store ddG to data
             data.loc["ddG"] = ddG
-            data.loc["transformed_ddG"] = transformed_ddG
-            data.loc["lambda"] = lambda_
-            data.loc["shift"] = shift
+            
+            if boxcox_:
+                # Box-cox transformation
+                shift = abs(ddG.min()) + 1.0
+                transformed_ddG, lambda_ = boxcox(ddG + shift)
+                data.loc["transformed_ddG"] = transformed_ddG
+                data.loc["lambda"] = lambda_
+                data.loc["shift"] = shift
+            else:
+                data.loc['transformed_ddG'] = ddG
+                data.loc["lambda"] = False
+                data.loc["shift"] = False
             
             # Save to .csv file
             if save_to_file:
                 data.to_csv(save_to_file)
             
-            return data
         else:
             raise ValueError("descriptors none")
     else:
         data = pd.read_csv(from_file, index_col=0, dtype={"Unnamed: 0": np.str})
-        return data
+    
+    # clear
+    catalyst_descriptors = {}
+    imine_descriptors = {}
+    thiol_descriptors = {}
+    product_descriptors = {}
+    
+    return data
 
 
 # split data and conduct feature_selection
-def load_data(data, train_combinations, test_combinations, feature_selection="", n_features=100):
+def load_data(data, train_combinations, test_combinations, feature_selection=None, n_features=100, threshold=0.1):
     train = data[train_combinations].T
     test = data[test_combinations].T
     
@@ -256,10 +269,15 @@ def load_data(data, train_combinations, test_combinations, feature_selection="",
         selector.fit(train_X, train_Y)
         train_X = selector.transform(train_X)
         test_X = selector.transform(test_X)
-    elif feature_selction == "":
+    elif feature_selection == "variance_threshold":
+        selector = VarianceThreshold(threshold=threshold)
+        selector.fit(train_X)
+        train_X = selector.transform(train_X)
+        test_X = selector.transform(test_X)
+    elif feature_selection is None:
         pass
     else:
-        raise ValueError(f"Invalid feature selection method: '{feature_selection}'.")
+        raise ValueError("Invalid feature selection method: '{}'".format(feature_selection))
     
     return {"train_X": train_X, 
             "test_X": test_X,
