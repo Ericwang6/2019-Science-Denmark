@@ -1,0 +1,14 @@
+smiles,label
+C=CC[*],1
+C=C(Br)C[*],2
+[*]CC1=CC=CC=C1,3
+[*]CC1=CC=C(I)C=C1,4
+[*]CC1=CC=C(C(F)(F)F)C=C1,5
+[*]CC1=CC=C(F)C(F)=C1F,6
+[*]CC1=CC(F)=C(F)C(F)=C1,7
+CCC([*])=O,8
+CCCCCC([*])=O,9
+O=C([*])CC(C)C,10
+O=C([*])C1=CC=CC=C1,11
+[*]CC1=C2C(C=CC=C2)=CC=C1,12
+[*]CC1=C2C(C=CC=C2)=CC3=CC=CC=C31,13
