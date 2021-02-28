@@ -112,3 +112,6 @@
 2. 寻找新的反应，并在新的反应上测试各种描述符的表现
 
 3. 学习量化软件的使用，复现Sigman的Nature文章
+
+## 2020.11.01 更新
+复现工作结束。将MIF-based descriptor计算代码整理成工具包，发布在https://github.com/Ericwang6/MIF-based-Descriptor上，上传了对Zahrt et.al, Science, 2019和Henle et.al, 2020, JACS两篇文章的复现结果```20201024.pptx```
